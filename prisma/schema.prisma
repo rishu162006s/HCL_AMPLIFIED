@@ -1,0 +1,349 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ProficiencyLevel {
+  NONE
+  BASIC
+  INTERMEDIATE
+  EXPERT
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+enum ResourceType {
+  COURSE
+  PROJECT
+  ARTICLE
+  VIDEO
+  BOOK
+  ASSESSMENT
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum GoalObjective {
+  PERSONAL
+  CAREER
+  ACADEMIC
+  INTERVIEW
+  PROJECT
+}
+
+enum TheoryPracticeRatio {
+  MORE_THEORY
+  BALANCED
+  MORE_PRACTICE
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+
+  technicalLevel ExperienceLevel
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills          UserSkill[]
+  goals           Goal[]
+  learningHistory LearningHistory[]
+  progress        Progress[]
+  feedback        Feedback[]
+  learningPaths   LearningPath[]
+  topicMasteries  TopicMastery[]
+  quizAttempts    QuizAttempt[]
+}
+
+model Skill {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  users      UserSkill[]
+  goalSkills GoalSkill[]
+  topics     Topic[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserSkill {
+  id String @id @default(uuid())
+
+  userId  String
+  skillId String
+
+  level ProficiencyLevel
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId])
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      GoalStatus @default(ACTIVE)
+
+  objective GoalObjective @default(PERSONAL)
+
+  targetDate  DateTime?
+  weeklyHours Float?
+
+  preferredResourceTypes ResourceType[]
+
+  theoryPracticeRatio TheoryPracticeRatio?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  requiredSkills GoalSkill[]
+  learningPaths  LearningPath[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GoalSkill {
+  id String @id @default(uuid())
+
+  goalId  String
+  skillId String
+
+  currentLevel ProficiencyLevel
+  targetLevel  ProficiencyLevel
+
+  goal  Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([goalId, skillId])
+}
+
+model Resource {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  type        ResourceType
+
+  difficulty ExperienceLevel?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progress        Progress[]
+  learningHistory LearningHistory[]
+  learningSteps   LearningStep[]
+  topics          TopicResource[]
+}
+
+model LearningHistory {
+  id String @id @default(uuid())
+
+  userId     String
+  resourceId String
+
+  completedAt DateTime?
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, resourceId])
+}
+
+model LearningPath {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+
+  userId String
+  goalId String?
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal Goal? @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  steps LearningStep[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LearningStep {
+  id Int @id @default(autoincrement())
+
+  learningPathId String
+  resourceId     String
+
+  order     Int
+  milestone String?
+
+  learningPath LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  resource     Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([learningPathId, order])
+}
+
+model Progress {
+  id String @id @default(uuid())
+
+  userId     String
+  resourceId String
+
+  status   ProgressStatus @default(NOT_STARTED)
+  progress Int            @default(0)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, resourceId])
+}
+
+model Feedback {
+  id String @id @default(uuid())
+
+  userId  String
+  rating  Int
+  comment String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Topic {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  masteries     TopicMastery[]
+  quizzes       Quiz[]
+  prerequisites TopicPrerequisite[] @relation("TopicPrerequisites")
+  dependents    TopicPrerequisite[] @relation("TopicDependents")
+  resources     TopicResource[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([skillId, name])
+}
+
+model TopicPrerequisite {
+  id String @id @default(uuid())
+
+  topicId        String
+  prerequisiteId String
+
+  topic        Topic @relation("TopicPrerequisites", fields: [topicId], references: [id], onDelete: Cascade)
+  prerequisite Topic @relation("TopicDependents", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, prerequisiteId])
+}
+
+model TopicMastery {
+  id String @id @default(uuid())
+
+  userId  String
+  topicId String
+
+  score Int @default(0)
+
+  status String
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, topicId])
+}
+
+model Quiz {
+  id String @id @default(uuid())
+
+  title String
+
+  topicId String
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  createdAt DateTime @default(now())
+}
+
+model QuizQuestion {
+  id String @id @default(uuid())
+
+  question String
+
+  quizId String
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  answers QuizAnswer[]
+}
+
+model QuizAnswer {
+  id String @id @default(uuid())
+
+  answerText String
+  isCorrect  Boolean @default(false)
+
+  questionId String
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model QuizAttempt {
+  id String @id @default(uuid())
+
+  userId String
+  quizId String
+
+  score       Int
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model TopicResource {
+  id String @id @default(uuid())
+
+  topicId    String
+  resourceId String
+
+  topic    Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, resourceId])
+}
