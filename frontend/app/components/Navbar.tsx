@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
@@ -14,6 +15,23 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const [initials, setInitials] = useState('U');
+  useEffect(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.name) {
+        setInitials(user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0,2));
+      }
+    } catch {}
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.replace("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#d8d5c8] bg-[#f7f5e9]/95 backdrop-blur-xl">
@@ -64,8 +82,16 @@ export default function Navbar() {
               href="/profile"
               className="grid h-10 w-10 place-items-center rounded-full bg-[#a98cff] text-xs font-bold"
             >
-              K
+              {initials}
             </Link>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-[11px] font-semibold text-[#68665e] hover:text-[#181818]"
+            >
+              Sign out
+            </button>
           </div>
         </div>
 

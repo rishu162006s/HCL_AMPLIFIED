@@ -1,9 +1,8 @@
-import {
-  Request,
-  Response,
-} from "express";
+
+import { Response } from "express";
 
 import {
+  generateNewLearningPath,
   addResourceToLearningPath,
   createNewLearningPath,
   getMyLearningPath,
@@ -23,11 +22,12 @@ import {
   createLearningPathSchema,
   reorderLearningStepSchema,
   updateLearningPathSchema,
+  generateLearningPathSchema,
 } from "../validators/learningPath.validators";
 
-// --------------------------------------------------
-// CREATE
-// --------------------------------------------------
+// ==================================================
+// CREATE LEARNING PATH
+// ==================================================
 
 export const createLearningPathController =
   async (
@@ -53,40 +53,30 @@ export const createLearningPathController =
         data: learningPath,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "GOAL_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message: "Goal not found",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_GOAL_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot use another user's goal",
-        });
-        return;
-      }
-
       if (error instanceof Error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-        return;
+        switch (error.message) {
+          case "GOAL_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message: "Goal not found",
+            });
+
+          case "UNAUTHORIZED_GOAL_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot use another user's goal",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -94,9 +84,9 @@ export const createLearningPathController =
     }
   };
 
-// --------------------------------------------------
-// GET ALL
-// --------------------------------------------------
+// ==================================================
+// GET MY LEARNING PATHS
+// ==================================================
 
 export const getMyLearningPathsController =
   async (
@@ -113,7 +103,12 @@ export const getMyLearningPathsController =
         success: true,
         data: paths,
       });
-    } catch {
+    } catch (error) {
+      console.error(
+        "Get learning paths error:",
+        error
+      );
+
       res.status(500).json({
         success: false,
         message:
@@ -122,9 +117,9 @@ export const getMyLearningPathsController =
     }
   };
 
-// --------------------------------------------------
-// GET ONE
-// --------------------------------------------------
+// ==================================================
+// GET ONE LEARNING PATH
+// ==================================================
 
 export const getLearningPathController =
   async (
@@ -143,33 +138,31 @@ export const getLearningPathController =
         data: learningPath,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_PATH_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning path not found",
-        });
-        return;
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot access this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot access this learning path",
-        });
-        return;
-      }
-
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -177,9 +170,9 @@ export const getLearningPathController =
     }
   };
 
-// --------------------------------------------------
-// UPDATE
-// --------------------------------------------------
+// ==================================================
+// UPDATE LEARNING PATH
+// ==================================================
 
 export const updateLearningPathController =
   async (
@@ -206,41 +199,31 @@ export const updateLearningPathController =
         data: learningPath,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_PATH_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning path not found",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot modify this learning path",
-        });
-        return;
-      }
-
       if (error instanceof Error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-        return;
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot modify this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -248,9 +231,9 @@ export const updateLearningPathController =
     }
   };
 
-// --------------------------------------------------
-// DELETE
-// --------------------------------------------------
+// ==================================================
+// DELETE LEARNING PATH
+// ==================================================
 
 export const deleteLearningPathController =
   async (
@@ -269,33 +252,31 @@ export const deleteLearningPathController =
           "Learning path deleted successfully",
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_PATH_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning path not found",
-        });
-        return;
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot delete this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot delete this learning path",
-        });
-        return;
-      }
-
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -303,9 +284,9 @@ export const deleteLearningPathController =
     }
   };
 
-// --------------------------------------------------
-// ADD STEP
-// --------------------------------------------------
+// ==================================================
+// ADD RESOURCE / LEARNING STEP
+// ==================================================
 
 export const addLearningStepController =
   async (
@@ -332,67 +313,45 @@ export const addLearningStepController =
         data: step,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_PATH_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning path not found",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "RESOURCE_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Resource not found",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "RESOURCE_ALREADY_IN_PATH"
-      ) {
-        res.status(409).json({
-          success: false,
-          message:
-            "Resource is already in this learning path",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot modify this learning path",
-        });
-        return;
-      }
-
       if (error instanceof Error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-        return;
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "RESOURCE_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Resource not found",
+            });
+
+          case "RESOURCE_ALREADY_IN_PATH":
+            return res.status(409).json({
+              success: false,
+              message:
+                "Resource is already in this learning path",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot modify this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -400,9 +359,9 @@ export const addLearningStepController =
     }
   };
 
-// --------------------------------------------------
-// DELETE STEP
-// --------------------------------------------------
+// ==================================================
+// DELETE LEARNING STEP
+// ==================================================
 
 export const deleteLearningStepController =
   async (
@@ -410,10 +369,21 @@ export const deleteLearningStepController =
     res: Response
   ) => {
     try {
+      const stepId =
+        Number(req.params.stepId);
+
+      if (!Number.isInteger(stepId)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid learning step ID",
+        });
+      }
+
       await removeLearningStep(
         req.user!.userId,
         req.params.learningPathId as string,
-        Number(req.params.stepId)
+        stepId
       );
 
       res.status(200).json({
@@ -422,46 +392,45 @@ export const deleteLearningStepController =
           "Learning step deleted successfully",
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_STEP_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning step not found",
-        });
-        return;
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "LEARNING_STEP_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning step not found",
+            });
+
+          case "LEARNING_STEP_NOT_IN_PATH":
+            return res.status(400).json({
+              success: false,
+              message:
+                "Learning step does not belong to this path",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot modify this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_STEP_NOT_IN_PATH"
-      ) {
-        res.status(400).json({
-          success: false,
-          message:
-            "Learning step does not belong to this path",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot modify this learning path",
-        });
-        return;
-      }
-
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
@@ -469,9 +438,9 @@ export const deleteLearningStepController =
     }
   };
 
-// --------------------------------------------------
-// REORDER STEP
-// --------------------------------------------------
+// ==================================================
+// REORDER LEARNING STEP
+// ==================================================
 
 export const reorderLearningStepController =
   async (
@@ -484,11 +453,22 @@ export const reorderLearningStepController =
           req.body
         );
 
+      const stepId =
+        Number(req.params.stepId);
+
+      if (!Number.isInteger(stepId)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid learning step ID",
+        });
+      }
+
       const step =
         await reorderLearningStep(
           req.user!.userId,
           req.params.learningPathId as string,
-          Number(req.params.stepId),
+          stepId,
           data.order
         );
 
@@ -499,57 +479,185 @@ export const reorderLearningStepController =
         data: step,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_STEP_NOT_FOUND"
-      ) {
-        res.status(404).json({
-          success: false,
-          message:
-            "Learning step not found",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "LEARNING_STEP_NOT_IN_PATH"
-      ) {
-        res.status(400).json({
-          success: false,
-          message:
-            "Learning step does not belong to this path",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "UNAUTHORIZED_LEARNING_PATH_ACCESS"
-      ) {
-        res.status(403).json({
-          success: false,
-          message:
-            "You cannot modify this learning path",
-        });
-        return;
-      }
-
       if (error instanceof Error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-        return;
+        switch (error.message) {
+          case "LEARNING_PATH_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning path not found",
+            });
+
+          case "LEARNING_STEP_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Learning step not found",
+            });
+
+          case "LEARNING_STEP_NOT_IN_PATH":
+            return res.status(400).json({
+              success: false,
+              message:
+                "Learning step does not belong to this path",
+            });
+
+          case "UNAUTHORIZED_LEARNING_PATH_ACCESS":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You cannot modify this learning path",
+            });
+
+          default:
+            return res.status(400).json({
+              success: false,
+              message: error.message,
+            });
+        }
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message:
           "Internal server error",
       });
     }
   };
+
+// ==================================================
+// GENERATE AI LEARNING PATH
+// ==================================================
+
+export const generateLearningPathController =
+  async (
+    req: AuthenticatedRequest,
+    res: Response
+  ) => {
+    try {
+      const data =
+        generateLearningPathSchema.parse(
+          req.body
+        );
+
+      const learningPath =
+        await generateNewLearningPath(
+          req.user!.userId,
+          data.goalId
+        );
+
+      res.status(201).json({
+        success: true,
+        message:
+          "Learning path generated successfully",
+        data: learningPath,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "GOAL_NOT_FOUND":
+            return res.status(404).json({
+              success: false,
+              message:
+                "Goal not found",
+            });
+
+          case "FORBIDDEN":
+            return res.status(403).json({
+              success: false,
+              message:
+                "You do not have access to this goal",
+            });
+
+          case "NO_GOAL_SKILLS":
+            return res.status(400).json({
+              success: false,
+              message:
+                "Goal has no required skills. Analyze the goal first.",
+            });
+
+          case "NO_USABLE_TOPICS":
+            return res.status(400).json({
+              success: false,
+              message:
+                "No topics with resources are available for this goal.",
+            });
+
+          case "AI_GENERATED_NO_TOPICS":
+            return res.status(502).json({
+              success: false,
+              message:
+                "AI did not select any topics.",
+            });
+
+          case "AI_GENERATED_NO_LEARNING_STEPS":
+            return res.status(502).json({
+              success: false,
+              message:
+                "AI generated a path without usable learning steps.",
+            });
+
+          case "AI_INVALID_JSON":
+            return res.status(502).json({
+              success: false,
+              message:
+                "AI returned an invalid response.",
+            });
+
+          case "AI_INVALID_LEARNING_PATH":
+            return res.status(502).json({
+              success: false,
+              message:
+                "AI generated an invalid learning path.",
+            });
+
+          case "AI_INVALID_PREREQUISITE_ORDER":
+            return res.status(502).json({
+              success: false,
+              message:
+                "AI generated an invalid prerequisite order.",
+            });
+
+          case "TOPIC_PREREQUISITE_CYCLE":
+            return res.status(400).json({
+              success: false,
+              message:
+                "A circular topic prerequisite was detected.",
+            });
+
+          case "TOPIC_PREREQUISITE_NOT_FOUND":
+            return res.status(400).json({
+              success: false,
+              message:
+                "A topic prerequisite could not be found.",
+            });
+
+          case "PREREQUISITE_HAS_NO_RESOURCE":
+            return res.status(400).json({
+              success: false,
+              message:
+                "A required prerequisite topic has no resource.",
+            });
+
+          default:
+            console.error(
+              "Generate learning path error:",
+              error
+            );
+
+            return res.status(400).json({
+              success: false,
+              message:
+                error.message,
+            });
+        }
+      }
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Internal server error",
+      });
+    }
+  };
+

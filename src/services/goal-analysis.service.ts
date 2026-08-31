@@ -66,15 +66,17 @@ export const analyzeGoal = async (
   const goalSkills = [];
 
   for (const skillName of detectedSkills) {
-    const skill = await prisma.skill.upsert({
-      where: {
-        name: skillName,
-      },
-      update: {},
-      create: {
-        name: skillName,
-      },
-    });
+    const skill = await prisma.skill.findUnique({
+  where: {
+    name: skillName,
+  },
+});
+
+if (!skill) {
+  throw new Error(
+    `GLOBAL_SKILL_NOT_FOUND: ${skillName}`
+  );
+}
 
     const goalSkill = await prisma.goalSkill.upsert({
       where: {

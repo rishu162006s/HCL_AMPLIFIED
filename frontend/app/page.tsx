@@ -210,7 +210,7 @@ export default function Home() {
 
             <div className="flex flex-col justify-end">
               <p className="text-lg leading-8">
-                Ask why you're struggling. Ask what to study next. Ask for an
+                Ask why you&apos;re struggling. Ask what to study next. Ask for an
                 explanation. Generate a quiz. Get recommendations based on
                 your actual learning history.
               </p>

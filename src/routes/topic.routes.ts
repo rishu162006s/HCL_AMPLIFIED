@@ -1,16 +1,16 @@
 import { Router } from "express";
 
 import {
-  addPrerequisiteController,
   createTopicController,
-  deletePrerequisiteController,
-  deleteTopicController,
-  getTopicController,
   getAllTopicsController,
-  getTopicsBySkillController,
-  getUserMasteriesController,
+  getTopicController,
+  getTopicsForSkillController,
   updateTopicController,
-  updateUserMasteryController,
+  deleteTopicController,
+  addTopicPrerequisiteController,
+  deleteTopicPrerequisiteController,
+  getUserTopicMasteriesController,
+  updateUserTopicMasteryController,
   addResourceToTopicController,
   getResourcesForTopicController,
   removeResourceFromTopicController,
@@ -20,102 +20,101 @@ import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
-// ========================================
-// Public topic information
-// ========================================
+router.use(authenticate);
 
+// --------------------------------------------------
+// TOPICS
+// --------------------------------------------------
+
+// Create topic
+router.post(
+  "/",
+  createTopicController
+);
+
+// Get all topics
 router.get(
   "/",
   getAllTopicsController
 );
 
+// Get topics for a skill
+// IMPORTANT: must be before /:topicId
 router.get(
   "/skill/:skillId",
-  getTopicsBySkillController
+  getTopicsForSkillController
 );
 
-// ========================================
-// User mastery
-// ========================================
-
+// Get my topic masteries
 router.get(
-  "/me/masteries",
-  authenticate,
-  getUserMasteriesController
+  "/mastery",
+  getUserTopicMasteriesController
 );
 
+// Get one topic
+router.get(
+  "/:topicId",
+  getTopicController
+);
+
+// Update topic
+router.patch(
+  "/:topicId",
+  updateTopicController
+);
+
+// Delete topic
+router.delete(
+  "/:topicId",
+  deleteTopicController
+);
+
+// --------------------------------------------------
+// TOPIC PREREQUISITES
+// --------------------------------------------------
+
+// Add prerequisite
 router.post(
-  "/me/masteries",
-  authenticate,
-  updateUserMasteryController
+  "/:topicId/prerequisites",
+  addTopicPrerequisiteController
 );
 
-// ========================================
-// Topic ↔ Resource
-// ========================================
+// Delete prerequisite
+router.delete(
+  "/:topicId/prerequisites/:prerequisiteId",
+  deleteTopicPrerequisiteController
+);
 
+// --------------------------------------------------
+// TOPIC MASTERY
+// --------------------------------------------------
+
+// Update/create mastery for the authenticated user
+router.patch(
+  "/:topicId/mastery",
+  updateUserTopicMasteryController
+);
+
+// --------------------------------------------------
+// TOPIC ↔ RESOURCE
+// --------------------------------------------------
+
+// Add resource to topic
+router.post(
+  "/:topicId/resources",
+  addResourceToTopicController
+);
+
+// Get resources for topic
 router.get(
   "/:topicId/resources",
   getResourcesForTopicController
 );
 
-router.post(
-  "/:topicId/resources",
-  authenticate,
-  addResourceToTopicController
-);
-
+// Remove resource from topic
 router.delete(
   "/:topicId/resources/:resourceId",
-  authenticate,
   removeResourceFromTopicController
-);
-
-// ========================================
-// Topic administration
-// ========================================
-
-router.post(
-  "/",
-  authenticate,
-  createTopicController
-);
-
-router.patch(
-  "/:topicId",
-  authenticate,
-  updateTopicController
-);
-
-router.delete(
-  "/:topicId",
-  authenticate,
-  deleteTopicController
-);
-
-// ========================================
-// Prerequisites
-// ========================================
-
-router.post(
-  "/:topicId/prerequisites",
-  authenticate,
-  addPrerequisiteController
-);
-
-router.delete(
-  "/:topicId/prerequisites/:prerequisiteId",
-  authenticate,
-  deletePrerequisiteController
-);
-
-// ========================================
-// Single topic
-// ========================================
-
-router.get(
-  "/:topicId",
-  getTopicController
 );
 
 export default router;

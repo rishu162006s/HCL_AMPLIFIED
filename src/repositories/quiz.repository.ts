@@ -1,5 +1,9 @@
 import prisma from "../config/prisma";
 
+// --------------------------------------------------
+// GET QUIZ BY ID
+// --------------------------------------------------
+
 export const findQuizById = async (
   id: string
 ) => {
@@ -22,6 +26,10 @@ export const findQuizById = async (
   });
 };
 
+// --------------------------------------------------
+// GET QUIZZES BY TOPIC
+// --------------------------------------------------
+
 export const findQuizzesByTopicId = async (
   topicId: string
 ) => {
@@ -43,6 +51,10 @@ export const findQuizzesByTopicId = async (
   });
 };
 
+// --------------------------------------------------
+// GET ALL QUIZZES
+// --------------------------------------------------
+
 export const findAllQuizzes = async () => {
   return prisma.quiz.findMany({
     include: {
@@ -53,6 +65,10 @@ export const findAllQuizzes = async () => {
     },
   });
 };
+
+// --------------------------------------------------
+// CREATE QUIZ
+// --------------------------------------------------
 
 export const createQuiz = async (data: {
   title: string;
@@ -68,6 +84,10 @@ export const createQuiz = async (data: {
     },
   });
 };
+
+// --------------------------------------------------
+// UPDATE QUIZ
+// --------------------------------------------------
 
 export const updateQuiz = async (
   id: string,
@@ -86,6 +106,10 @@ export const updateQuiz = async (
   });
 };
 
+// --------------------------------------------------
+// DELETE QUIZ
+// --------------------------------------------------
+
 export const deleteQuiz = async (
   id: string
 ) => {
@@ -96,21 +120,30 @@ export const deleteQuiz = async (
   });
 };
 
-export const createQuizQuestion =
-  async (data: {
+// --------------------------------------------------
+// CREATE QUESTION
+// --------------------------------------------------
+
+export const createQuizQuestion = async (
+  data: {
     question: string;
     quizId: string;
-  }) => {
-    return prisma.quizQuestion.create({
-      data: {
-        question: data.question,
-        quizId: data.quizId,
-      },
-      include: {
-        answers: true,
-      },
-    });
-  };
+  }
+) => {
+  return prisma.quizQuestion.create({
+    data: {
+      question: data.question,
+      quizId: data.quizId,
+    },
+    include: {
+      answers: true,
+    },
+  });
+};
+
+// --------------------------------------------------
+// GET QUESTION BY ID
+// --------------------------------------------------
 
 export const findQuizQuestionById = async (
   id: string
@@ -126,32 +159,44 @@ export const findQuizQuestionById = async (
   });
 };
 
-export const updateQuizQuestion =
-  async (
-    id: string,
-    data: {
-      question?: string;
-    }
-  ) => {
-    return prisma.quizQuestion.update({
-      where: {
-        id,
-      },
-      data,
-      include: {
-        answers: true,
-      },
-    });
-  };
+// --------------------------------------------------
+// UPDATE QUESTION
+// --------------------------------------------------
 
-export const deleteQuizQuestion =
-  async (id: string) => {
-    return prisma.quizQuestion.delete({
-      where: {
-        id,
-      },
-    });
-  };
+export const updateQuizQuestion = async (
+  id: string,
+  data: {
+    question?: string;
+  }
+) => {
+  return prisma.quizQuestion.update({
+    where: {
+      id,
+    },
+    data,
+    include: {
+      answers: true,
+    },
+  });
+};
+
+// --------------------------------------------------
+// DELETE QUESTION
+// --------------------------------------------------
+
+export const deleteQuizQuestion = async (
+  id: string
+) => {
+  return prisma.quizQuestion.delete({
+    where: {
+      id,
+    },
+  });
+};
+
+// --------------------------------------------------
+// CREATE ANSWER
+// --------------------------------------------------
 
 export const createQuizAnswer = async (
   data: {
@@ -163,12 +208,15 @@ export const createQuizAnswer = async (
   return prisma.quizAnswer.create({
     data: {
       answerText: data.answerText,
-      isCorrect:
-        data.isCorrect ?? false,
+      isCorrect: data.isCorrect ?? false,
       questionId: data.questionId,
     },
   });
 };
+
+// --------------------------------------------------
+// GET ANSWER BY ID
+// --------------------------------------------------
 
 export const findQuizAnswerById = async (
   id: string
@@ -179,6 +227,10 @@ export const findQuizAnswerById = async (
     },
   });
 };
+
+// --------------------------------------------------
+// UPDATE ANSWER
+// --------------------------------------------------
 
 export const updateQuizAnswer = async (
   id: string,
@@ -195,6 +247,10 @@ export const updateQuizAnswer = async (
   });
 };
 
+// --------------------------------------------------
+// DELETE ANSWER
+// --------------------------------------------------
+
 export const deleteQuizAnswer = async (
   id: string
 ) => {
@@ -205,71 +261,92 @@ export const deleteQuizAnswer = async (
   });
 };
 
-export const createQuizAttempt =
-  async (data: {
+// --------------------------------------------------
+// CREATE QUIZ ATTEMPT
+// --------------------------------------------------
+
+export const createQuizAttempt = async (
+  data: {
     userId: string;
     quizId: string;
     score: number;
-  }) => {
-    return prisma.quizAttempt.create({
-      data: {
-        userId: data.userId,
-        quizId: data.quizId,
-        score: data.score,
-      },
-      include: {
-        quiz: {
-          include: {
-            topic: true,
-          },
+  }
+) => {
+  return prisma.quizAttempt.create({
+    data: {
+      userId: data.userId,
+      quizId: data.quizId,
+      score: data.score,
+    },
+    include: {
+      quiz: {
+        include: {
+          topic: true,
         },
       },
-    });
-  };
+    },
+  });
+};
 
-export const findQuizAttemptById =
-  async (id: string) => {
-    return prisma.quizAttempt.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        quiz: {
-          include: {
-            topic: true,
-          },
+// --------------------------------------------------
+// GET QUIZ ATTEMPT BY ID
+// --------------------------------------------------
+
+export const findQuizAttemptById = async (
+  id: string
+) => {
+  return prisma.quizAttempt.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      quiz: {
+        include: {
+          topic: true,
         },
       },
-    });
-  };
+    },
+  });
+};
 
-export const findQuizAttemptsByUser =
-  async (userId: string) => {
-    return prisma.quizAttempt.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        quiz: {
-          include: {
-            topic: true,
-          },
+// --------------------------------------------------
+// GET USER QUIZ ATTEMPTS
+// --------------------------------------------------
+
+export const findQuizAttemptsByUser = async (
+  userId: string
+) => {
+  return prisma.quizAttempt.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      quiz: {
+        include: {
+          topic: true,
         },
       },
-      orderBy: {
-        completedAt: "desc",
-      },
-    });
-  };
+    },
+    orderBy: {
+      completedAt: "desc",
+    },
+  });
+};
 
-export const findQuizAttemptsByQuiz =
-  async (quizId: string) => {
-    return prisma.quizAttempt.findMany({
-      where: {
-        quizId,
-      },
-      orderBy: {
-        completedAt: "desc",
-      },
-    });
-  };
+// --------------------------------------------------
+// GET QUIZ ATTEMPTS
+// --------------------------------------------------
+
+export const findQuizAttemptsByQuiz = async (
+  quizId: string
+) => {
+  return prisma.quizAttempt.findMany({
+    where: {
+      quizId,
+    },
+    orderBy: {
+      completedAt: "desc",
+    },
+  });
+};
+

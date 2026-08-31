@@ -151,3 +151,28 @@ export const deleteUserSkill = async (
     },
   });
 };
+export const findSkillByNameInsensitive = async (
+  name: string
+) => {
+  const exact = await prisma.skill.findFirst({
+    where: {
+      name: {
+        equals: name.trim(),
+        mode: "insensitive",
+      },
+    },
+  });
+
+  if (exact) return exact;
+
+  const allSkills = await prisma.skill.findMany();
+  const search = name.trim().toLowerCase();
+
+  // Try substring matching (e.g. "Learn Python" -> "Python")
+  const matched = allSkills.find((s) => {
+    const sName = s.name.toLowerCase();
+    return search.includes(sName) || sName.includes(search);
+  });
+
+  return matched || null;
+};

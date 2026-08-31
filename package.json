@@ -7,7 +7,13 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "jest",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed:normalized": "tsx prisma/seed-normalized.ts"
+  },
+  "prisma":{
+        "seed": "tsx prisma/seed.ts"
+
   },
   "keywords": [],
   "author": "",

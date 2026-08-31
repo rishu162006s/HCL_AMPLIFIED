@@ -92,3 +92,18 @@ export const reorderLearningStepSchema =
         "Order must be at least 1"
       ),
   });
+  // --------------------------------------------------
+// GENERATE LEARNING PATH
+// --------------------------------------------------
+
+// --------------------------------------------------
+// GENERATE LEARNING PATH
+// --------------------------------------------------
+
+export const generateLearningPathSchema =
+  z.object({
+    goalId: z
+      .string()
+      .uuid(),
+  });
+  

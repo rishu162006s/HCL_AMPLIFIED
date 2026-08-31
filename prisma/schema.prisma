@@ -147,7 +147,7 @@ model Resource {
   id          String       @id @default(uuid())
   title       String
   description String?
-  url         String
+  url         String @unique
   type        ResourceType
 
   difficulty ExperienceLevel?

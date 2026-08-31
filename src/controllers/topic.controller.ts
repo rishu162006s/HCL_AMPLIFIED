@@ -1,63 +1,44 @@
+
 import { Request, Response } from "express";
 
 import {
+  addResourceToTopic,
   addTopicPrerequisite,
   createNewTopic,
   getAllTopics,
+  getResourcesForTopic,
   getTopic,
   getTopicsForSkill,
   getUserTopicMasteries,
+  removeResourceFromTopic,
   removeTopic,
   removeTopicPrerequisite,
   updateExistingTopic,
   updateUserTopicMastery,
-  addResourceToTopic,
-  getResourcesForTopic,
-  removeResourceFromTopic,
 } from "../services/topic.service";
 
 import {
   createTopicSchema,
-  prerequisiteSchema,
-  topicMasterySchema,
   updateTopicSchema,
+  topicPrerequisiteSchema,
+  updateTopicMasterySchema,
+  topicResourceSchema,
 } from "../validators/topic.validators";
 
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
-// ========================================
-// GET ALL TOPICS
-// ========================================
-
-export const getAllTopicsController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const topics = await getAllTopics();
-
-    res.status(200).json({
-      success: true,
-      data: topics,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
-
-// ========================================
+// --------------------------------------------------
 // CREATE TOPIC
-// ========================================
+// --------------------------------------------------
 
 export const createTopicController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const data = createTopicSchema.parse(req.body);
+    const data = createTopicSchema.parse(
+      req.body
+    );
 
     const topic = await createNewTopic(data);
 
@@ -84,7 +65,8 @@ export const createTopicController = async (
     ) {
       res.status(409).json({
         success: false,
-        message: "Topic already exists for this skill",
+        message:
+          "A topic with this name already exists for this skill",
       });
       return;
     }
@@ -104,27 +86,40 @@ export const createTopicController = async (
   }
 };
 
-// ========================================
-// GET SINGLE TOPIC
-// ========================================
+// --------------------------------------------------
+// GET ALL TOPICS
+// --------------------------------------------------
+
+export const getAllTopicsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const topics = await getAllTopics();
+
+    res.status(200).json({
+      success: true,
+      data: topics,
+    });
+  } catch {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// --------------------------------------------------
+// GET TOPIC BY ID
+// --------------------------------------------------
 
 export const getTopicController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const topicId = req.params.topicId;
-
-    if (!topicId) {
-      res.status(400).json({
-        success: false,
-        message: "Topic ID is required",
-      });
-      return;
-    }
-
     const topic = await getTopic(
-      topicId as string
+      req.params.topicId as string
     );
 
     res.status(200).json({
@@ -150,26 +145,20 @@ export const getTopicController = async (
   }
 };
 
-// ========================================
+// --------------------------------------------------
 // GET TOPICS BY SKILL
-// ========================================
+// --------------------------------------------------
 
-export const getTopicsBySkillController =
-  async (req: Request, res: Response) => {
+export const getTopicsForSkillController =
+  async (
+    req: Request,
+    res: Response
+  ) => {
     try {
-      const skillId = req.params.skillId;
-
-      if (!skillId) {
-        res.status(400).json({
-          success: false,
-          message: "Skill ID is required",
-        });
-        return;
-      }
-
-      const topics = await getTopicsForSkill(
-        skillId as string
-      );
+      const topics =
+        await getTopicsForSkill(
+          req.params.skillId as string
+        );
 
       res.status(200).json({
         success: true,
@@ -194,33 +183,23 @@ export const getTopicsBySkillController =
     }
   };
 
-// ========================================
+// --------------------------------------------------
 // UPDATE TOPIC
-// ========================================
+// --------------------------------------------------
 
 export const updateTopicController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const topicId = req.params.topicId;
+    const data =
+      updateTopicSchema.parse(req.body);
 
-    if (!topicId) {
-      res.status(400).json({
-        success: false,
-        message: "Topic ID is required",
-      });
-      return;
-    }
-
-    const data = updateTopicSchema.parse(
-      req.body
-    );
-
-    const topic = await updateExistingTopic(
-      topicId as string,
-      data
-    );
+    const topic =
+      await updateExistingTopic(
+        req.params.topicId as string,
+        data
+      );
 
     res.status(200).json({
       success: true,
@@ -254,26 +233,18 @@ export const updateTopicController = async (
   }
 };
 
-// ========================================
+// --------------------------------------------------
 // DELETE TOPIC
-// ========================================
+// --------------------------------------------------
 
 export const deleteTopicController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const topicId = req.params.topicId;
-
-    if (!topicId) {
-      res.status(400).json({
-        success: false,
-        message: "Topic ID is required",
-      });
-      return;
-    }
-
-    await removeTopic(topicId as string);
+    await removeTopic(
+      req.params.topicId as string
+    );
 
     res.status(200).json({
       success: true,
@@ -298,39 +269,49 @@ export const deleteTopicController = async (
   }
 };
 
-// ========================================
-// ADD PREREQUISITE
-// ========================================
+// --------------------------------------------------
+// ADD TOPIC PREREQUISITE
+// --------------------------------------------------
 
-export const addPrerequisiteController =
-  async (req: Request, res: Response) => {
+export const addTopicPrerequisiteController =
+  async (
+    req: Request,
+    res: Response
+  ) => {
     try {
-      const topicId = req.params.topicId;
-
-      if (!topicId) {
-        res.status(400).json({
-          success: false,
-          message: "Topic ID is required",
-        });
-        return;
-      }
-
-      const data = prerequisiteSchema.parse(
-        req.body
-      );
+      const data =
+        topicPrerequisiteSchema.parse(
+          req.body
+        );
 
       const prerequisite =
         await addTopicPrerequisite({
-          topicId: topicId as string,
-          prerequisiteId: data.prerequisiteId,
+          topicId:
+            req.params.topicId as string,
+          prerequisiteId:
+            data.prerequisiteId,
         });
 
       res.status(201).json({
         success: true,
-        message: "Prerequisite added successfully",
+        message:
+          "Topic prerequisite added successfully",
         data: prerequisite,
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message ===
+          "TOPIC_CANNOT_BE_ITS_OWN_PREREQUISITE"
+      ) {
+        res.status(400).json({
+          success: false,
+          message:
+            "A topic cannot be its own prerequisite",
+        });
+        return;
+      }
+
       if (
         error instanceof Error &&
         error.message === "TOPIC_NOT_FOUND"
@@ -349,7 +330,8 @@ export const addPrerequisiteController =
       ) {
         res.status(404).json({
           success: false,
-          message: "Prerequisite topic not found",
+          message:
+            "Prerequisite topic not found",
         });
         return;
       }
@@ -361,20 +343,8 @@ export const addPrerequisiteController =
       ) {
         res.status(409).json({
           success: false,
-          message: "Prerequisite already exists",
-        });
-        return;
-      }
-
-      if (
-        error instanceof Error &&
-        error.message ===
-          "TOPIC_CANNOT_BE_ITS_OWN_PREREQUISITE"
-      ) {
-        res.status(400).json({
-          success: false,
           message:
-            "A topic cannot be its own prerequisite",
+            "Prerequisite already exists",
         });
         return;
       }
@@ -394,44 +364,36 @@ export const addPrerequisiteController =
     }
   };
 
-// ========================================
-// DELETE PREREQUISITE
-// ========================================
+// --------------------------------------------------
+// DELETE TOPIC PREREQUISITE
+// --------------------------------------------------
 
-export const deletePrerequisiteController =
-  async (req: Request, res: Response) => {
+export const deleteTopicPrerequisiteController =
+  async (
+    req: Request,
+    res: Response
+  ) => {
     try {
-      const topicId = req.params.topicId;
-      const prerequisiteId =
-        req.params.prerequisiteId;
-
-      if (!topicId || !prerequisiteId) {
-        res.status(400).json({
-          success: false,
-          message:
-            "Topic ID and prerequisite ID are required",
-        });
-        return;
-      }
-
       await removeTopicPrerequisite(
-        topicId as string,
-        prerequisiteId as string
+        req.params.topicId as string,
+        req.params.prerequisiteId as string
       );
 
       res.status(200).json({
         success: true,
         message:
-          "Prerequisite removed successfully",
+          "Topic prerequisite deleted successfully",
       });
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "PREREQUISITE_NOT_FOUND"
+        error.message ===
+          "PREREQUISITE_NOT_FOUND"
       ) {
         res.status(404).json({
           success: false,
-          message: "Prerequisite not found",
+          message:
+            "Prerequisite relationship not found",
         });
         return;
       }
@@ -443,28 +405,20 @@ export const deletePrerequisiteController =
     }
   };
 
-// ========================================
-// GET USER MASTERIES
-// ========================================
+// --------------------------------------------------
+// GET MY TOPIC MASTERIES
+// --------------------------------------------------
 
-export const getUserMasteriesController =
+export const getUserTopicMasteriesController =
   async (
     req: AuthenticatedRequest,
     res: Response
   ) => {
     try {
-      const userId = req.user?.userId;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          message: "Unauthorized",
-        });
-        return;
-      }
-
       const masteries =
-        await getUserTopicMasteries(userId);
+        await getUserTopicMasteries(
+          req.user!.userId
+        );
 
       res.status(200).json({
         success: true,
@@ -478,34 +432,26 @@ export const getUserMasteriesController =
     }
   };
 
-// ========================================
-// UPDATE USER MASTERY
-// ========================================
+// --------------------------------------------------
+// UPDATE TOPIC MASTERY
+// --------------------------------------------------
 
-export const updateUserMasteryController =
+export const updateUserTopicMasteryController =
   async (
     req: AuthenticatedRequest,
     res: Response
   ) => {
     try {
-      const userId = req.user?.userId;
-
-      if (!userId) {
-        res.status(401).json({
-          success: false,
-          message: "Unauthorized",
-        });
-        return;
-      }
-
-      const data = topicMasterySchema.parse(
-        req.body
-      );
+      const data =
+        updateTopicMasterySchema.parse(
+          req.body
+        );
 
       const mastery =
         await updateUserTopicMastery({
-          userId,
-          topicId: data.topicId,
+          userId: req.user!.userId,
+          topicId:
+            req.params.topicId as string,
           score: data.score,
           status: data.status,
         });
@@ -543,9 +489,9 @@ export const updateUserMasteryController =
     }
   };
 
-// ========================================
+// --------------------------------------------------
 // ADD RESOURCE TO TOPIC
-// ========================================
+// --------------------------------------------------
 
 export const addResourceToTopicController =
   async (
@@ -553,29 +499,15 @@ export const addResourceToTopicController =
     res: Response
   ) => {
     try {
-      const topicId = req.params.topicId;
-      const resourceId = req.body.resourceId;
-
-      if (!topicId) {
-        res.status(400).json({
-          success: false,
-          message: "Topic ID is required",
-        });
-        return;
-      }
-
-      if (!resourceId) {
-        res.status(400).json({
-          success: false,
-          message: "Resource ID is required",
-        });
-        return;
-      }
+      const data =
+        topicResourceSchema.parse(
+          req.body
+        );
 
       const relation =
         await addResourceToTopic(
-          topicId as string,
-          resourceId
+          req.params.topicId as string,
+          data.resourceId
         );
 
       res.status(201).json({
@@ -585,38 +517,47 @@ export const addResourceToTopicController =
         data: relation,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        if (
-          error.message === "TOPIC_NOT_FOUND"
-        ) {
-          res.status(404).json({
-            success: false,
-            message: "Topic not found",
-          });
-          return;
-        }
+      if (
+        error instanceof Error &&
+        error.message === "TOPIC_NOT_FOUND"
+      ) {
+        res.status(404).json({
+          success: false,
+          message: "Topic not found",
+        });
+        return;
+      }
 
-        if (
-          error.message === "RESOURCE_NOT_FOUND"
-        ) {
-          res.status(404).json({
-            success: false,
-            message: "Resource not found",
-          });
-          return;
-        }
+      if (
+        error instanceof Error &&
+        error.message === "RESOURCE_NOT_FOUND"
+      ) {
+        res.status(404).json({
+          success: false,
+          message: "Resource not found",
+        });
+        return;
+      }
 
-        if (
-          error.message ===
+      if (
+        error instanceof Error &&
+        error.message ===
           "RESOURCE_ALREADY_ADDED_TO_TOPIC"
-        ) {
-          res.status(409).json({
-            success: false,
-            message:
-              "Resource is already associated with this topic",
-          });
-          return;
-        }
+      ) {
+        res.status(409).json({
+          success: false,
+          message:
+            "Resource is already associated with this topic",
+        });
+        return;
+      }
+
+      if (error instanceof Error) {
+        res.status(400).json({
+          success: false,
+          message: error.message,
+        });
+        return;
       }
 
       res.status(500).json({
@@ -626,9 +567,9 @@ export const addResourceToTopicController =
     }
   };
 
-// ========================================
+// --------------------------------------------------
 // GET RESOURCES FOR TOPIC
-// ========================================
+// --------------------------------------------------
 
 export const getResourcesForTopicController =
   async (
@@ -636,19 +577,9 @@ export const getResourcesForTopicController =
     res: Response
   ) => {
     try {
-      const topicId = req.params.topicId;
-
-      if (!topicId) {
-        res.status(400).json({
-          success: false,
-          message: "Topic ID is required",
-        });
-        return;
-      }
-
       const resources =
         await getResourcesForTopic(
-          topicId as string
+          req.params.topicId as string
         );
 
       res.status(200).json({
@@ -674,9 +605,9 @@ export const getResourcesForTopicController =
     }
   };
 
-// ========================================
-// REMOVE RESOURCE FROM TOPIC
-// ========================================
+// --------------------------------------------------
+// DELETE RESOURCE FROM TOPIC
+// --------------------------------------------------
 
 export const removeResourceFromTopicController =
   async (
@@ -684,22 +615,9 @@ export const removeResourceFromTopicController =
     res: Response
   ) => {
     try {
-      const topicId = req.params.topicId;
-      const resourceId =
-        req.params.resourceId;
-
-      if (!topicId || !resourceId) {
-        res.status(400).json({
-          success: false,
-          message:
-            "Topic ID and Resource ID are required",
-        });
-        return;
-      }
-
       await removeResourceFromTopic(
-        topicId as string,
-        resourceId as string
+        req.params.topicId as string,
+        req.params.resourceId as string
       );
 
       res.status(200).json({
@@ -708,28 +626,28 @@ export const removeResourceFromTopicController =
           "Resource removed from topic successfully",
       });
     } catch (error) {
-      if (error instanceof Error) {
-        if (
-          error.message === "TOPIC_NOT_FOUND"
-        ) {
-          res.status(404).json({
-            success: false,
-            message: "Topic not found",
-          });
-          return;
-        }
+      if (
+        error instanceof Error &&
+        error.message === "TOPIC_NOT_FOUND"
+      ) {
+        res.status(404).json({
+          success: false,
+          message: "Topic not found",
+        });
+        return;
+      }
 
-        if (
-          error.message ===
+      if (
+        error instanceof Error &&
+        error.message ===
           "RESOURCE_NOT_ASSOCIATED_WITH_TOPIC"
-        ) {
-          res.status(404).json({
-            success: false,
-            message:
-              "Resource is not associated with this topic",
-          });
-          return;
-        }
+      ) {
+        res.status(404).json({
+          success: false,
+          message:
+            "Resource is not associated with this topic",
+        });
+        return;
       }
 
       res.status(500).json({
@@ -738,3 +656,4 @@ export const removeResourceFromTopicController =
       });
     }
   };
+

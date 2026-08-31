@@ -20,7 +20,7 @@ export const goalAnalysisSchema = z.object({
     "INTERVIEW",
     "PERSONAL",
     "OTHER",
-  ]),
+  ]).nullable(),
 
   intendedOutcome: z.string().nullable(),
 

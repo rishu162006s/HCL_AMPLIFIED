@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const learningPathSchema = z.object({
-  title: z.string(),
+  title: z.string().min(1).default("Personalized Learning Path"),
 
   description: z.string(),
 
@@ -19,15 +19,15 @@ export const learningPathSchema = z.object({
 
       topics: z.array(
         z.object({
-          name: z.string(),
+          name: z.string().min(1).default("Practical Project"),
 
-          description: z.string(),
+          description: z.string().min(1).default("Build a practical project to apply this phase."),
 
           priority: z.enum([
             "LOW",
             "MEDIUM",
             "HIGH",
-          ]),
+          ]).default("MEDIUM"),
         })
       ),
     })
@@ -35,7 +35,7 @@ export const learningPathSchema = z.object({
 
   dailyStudyRecommendation: z.string(),
 
-  practicalProject: z.string().nullable(),
+  practicalProject: z.string().nullable().default(null),
 });
 
 export type LearningPathAI =

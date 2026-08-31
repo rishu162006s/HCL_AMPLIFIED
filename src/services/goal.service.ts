@@ -12,6 +12,53 @@ import {
 
 import { findSkillById } from "../repositories/skill.repository";
 
+type GoalWithPaths = NonNullable<
+  Awaited<ReturnType<typeof findGoalById>>
+>;
+
+const serializeGoal = (goal: GoalWithPaths) => {
+  const learningPath = goal.learningPaths[0] ?? null;
+  const steps = learningPath?.steps ?? [];
+  const totalResources = steps.length;
+
+  const completedResources = steps.filter((step) => {
+    const records = Array.isArray(step.resource.progress)
+      ? step.resource.progress
+      : [];
+    return records[0]?.status === "COMPLETED";
+  }).length;
+
+  const progress =
+    totalResources === 0
+      ? 0
+      : Math.round((completedResources / totalResources) * 100);
+
+  const nextStep = steps.find((step) => {
+    const records = Array.isArray(step.resource.progress)
+      ? step.resource.progress
+      : [];
+    return records[0]?.status !== "COMPLETED";
+  });
+
+  return {
+    ...goal,
+    skills: goal.requiredSkills,
+    learningPath,
+    progress,
+    completedResources,
+    totalResources,
+    resume: nextStep
+      ? {
+          learningPathId: learningPath?.id ?? null,
+          stepId: nextStep.id,
+          resourceId: nextStep.resource.id,
+          resourceTitle: nextStep.resource.title,
+          resourceUrl: nextStep.resource.url,
+        }
+      : null,
+  };
+};
+
 export const createNewGoal = async (data: {
   title: string;
   description?: string;
@@ -23,13 +70,23 @@ export const createNewGoal = async (data: {
     | "PROJECT";
   targetDate?: Date;
   weeklyHours?: number;
-  preferredResourceTypes:
-    | "COURSE"
-    | "PROJECT"
-    | "ARTICLE"
-    | "VIDEO"
-    | "BOOK"
-    | "ASSESSMENT";
+  preferredResourceTypes?:
+    | (
+        | "COURSE"
+        | "PROJECT"
+        | "ARTICLE"
+        | "VIDEO"
+        | "BOOK"
+        | "ASSESSMENT"
+      )
+    | (
+        | "COURSE"
+        | "PROJECT"
+        | "ARTICLE"
+        | "VIDEO"
+        | "BOOK"
+        | "ASSESSMENT"
+      )[];
   theoryPracticeRatio?:
     | "MORE_THEORY"
     | "BALANCED"
@@ -42,14 +99,15 @@ export const createNewGoal = async (data: {
 export const getMyGoals = async (
   userId: string
 ) => {
-  return findUserGoals(userId);
+  const goals = await findUserGoals(userId);
+  return goals.map(serializeGoal);
 };
 
 export const getGoal = async (
   goalId: string,
   userId: string
 ) => {
-  const goal = await findGoalById(goalId);
+  const goal = await findGoalById(goalId, userId);
 
   if (!goal) {
     throw new Error("GOAL_NOT_FOUND");
@@ -59,7 +117,7 @@ export const getGoal = async (
     throw new Error("FORBIDDEN");
   }
 
-  return goal;
+  return serializeGoal(goal);
 };
 
 export const updateExistingGoal = async (
@@ -81,12 +139,22 @@ export const updateExistingGoal = async (
     targetDate?: Date | null;
     weeklyHours?: number | null;
     preferredResourceTypes?:
-      | "COURSE"
-      | "PROJECT"
-      | "ARTICLE"
-      | "VIDEO"
-      | "BOOK"
-      | "ASSESSMENT";
+      | (
+          | "COURSE"
+          | "PROJECT"
+          | "ARTICLE"
+          | "VIDEO"
+          | "BOOK"
+          | "ASSESSMENT"
+        )
+      | (
+          | "COURSE"
+          | "PROJECT"
+          | "ARTICLE"
+          | "VIDEO"
+          | "BOOK"
+          | "ASSESSMENT"
+        )[];
     theoryPracticeRatio?:
       | "MORE_THEORY"
       | "BALANCED"

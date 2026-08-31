@@ -51,6 +51,44 @@ export const getProgressAnalytics = async (
     select: {
       progress: true,
       status: true,
+      resourceId: true,
+    },
+  });
+};
+
+export const getLearningPathAnalytics = async (
+  userId: string
+) => {
+  return prisma.learningPath.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      goal: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+      steps: {
+        orderBy: {
+          order: "asc",
+        },
+        include: {
+          resource: {
+            include: {
+              progress: {
+                where: {
+                  userId,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 };

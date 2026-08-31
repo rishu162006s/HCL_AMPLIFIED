@@ -229,12 +229,12 @@ export type ResourceOrderByWithRelationInput = {
 
 export type ResourceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  url?: string
   AND?: Prisma.ResourceWhereInput | Prisma.ResourceWhereInput[]
   OR?: Prisma.ResourceWhereInput[]
   NOT?: Prisma.ResourceWhereInput | Prisma.ResourceWhereInput[]
   title?: Prisma.StringFilter<"Resource"> | string
   description?: Prisma.StringNullableFilter<"Resource"> | string | null
-  url?: Prisma.StringFilter<"Resource"> | string
   type?: Prisma.EnumResourceTypeFilter<"Resource"> | $Enums.ResourceType
   difficulty?: Prisma.EnumExperienceLevelNullableFilter<"Resource"> | $Enums.ExperienceLevel | null
   createdAt?: Prisma.DateTimeFilter<"Resource"> | Date | string
@@ -243,7 +243,7 @@ export type ResourceWhereUniqueInput = Prisma.AtLeast<{
   learningHistory?: Prisma.LearningHistoryListRelationFilter
   learningSteps?: Prisma.LearningStepListRelationFilter
   topics?: Prisma.TopicResourceListRelationFilter
-}, "id">
+}, "id" | "url">
 
 export type ResourceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

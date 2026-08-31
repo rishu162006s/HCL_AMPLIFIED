@@ -30,14 +30,28 @@ export const createGoalSchema = z.object({
     .max(168)
     .optional(),
 
-  preferredResourceTypes: z.enum([
-    "COURSE",
-    "PROJECT",
-    "ARTICLE",
-    "VIDEO",
-    "BOOK",
-    "ASSESSMENT",
-  ]),
+  preferredResourceTypes: z
+    .union([
+      z.enum([
+        "COURSE",
+        "PROJECT",
+        "ARTICLE",
+        "VIDEO",
+        "BOOK",
+        "ASSESSMENT",
+      ]),
+      z.array(
+        z.enum([
+          "COURSE",
+          "PROJECT",
+          "ARTICLE",
+          "VIDEO",
+          "BOOK",
+          "ASSESSMENT",
+        ])
+      ),
+    ])
+    .optional(),
 
   theoryPracticeRatio: z
     .enum([
@@ -93,13 +107,25 @@ export const updateGoalSchema = z.object({
     .optional(),
 
   preferredResourceTypes: z
-    .enum([
-      "COURSE",
-      "PROJECT",
-      "ARTICLE",
-      "VIDEO",
-      "BOOK",
-      "ASSESSMENT",
+    .union([
+      z.enum([
+        "COURSE",
+        "PROJECT",
+        "ARTICLE",
+        "VIDEO",
+        "BOOK",
+        "ASSESSMENT",
+      ]),
+      z.array(
+        z.enum([
+          "COURSE",
+          "PROJECT",
+          "ARTICLE",
+          "VIDEO",
+          "BOOK",
+          "ASSESSMENT",
+        ])
+      ),
     ])
     .optional(),
 

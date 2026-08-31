@@ -1,0 +1,103 @@
+{
+  "skills": [
+    { "id": "skill-python", "name": "Python", "description": "Master Python programming from basics to advanced" },
+    { "id": "skill-java", "name": "Java", "description": "Learn Java for enterprise and Android development" },
+    { "id": "skill-sql", "name": "SQL", "description": "Database design and query optimization" },
+    { "id": "skill-ml", "name": "Machine Learning", "description": "AI and Machine Learning fundamentals" },
+    { "id": "skill-dl", "name": "Deep Learning", "description": "Neural networks and advanced deep learning" }
+  ],
+  "topics": {
+    "python": [
+      { "id": "Python Basics", "skillId": "skill-python", "name": "Python Basics", "description": "Introduction to Python syntax and environment", "prerequisites": [] },
+      { "id": "Variables and Data Types", "skillId": "skill-python", "name": "Variables and Data Types", "description": "Understanding variables, types, and basic operations", "prerequisites": ["Python Basics"] },
+      { "id": "Control Flow", "skillId": "skill-python", "name": "Control Flow", "description": "If-else, loops, and control structures", "prerequisites": ["Python Basics"] },
+      { "id": "Functions", "skillId": "skill-python", "name": "Functions", "description": "Function definition, parameters, and scope", "prerequisites": ["Control Flow"] },
+      { "id": "Data Structures", "skillId": "skill-python", "name": "Data Structures", "description": "Lists, tuples, dictionaries, and sets", "prerequisites": ["Variables and Data Types"] },
+      { "id": "Object-Oriented Programming", "skillId": "skill-python", "name": "Object-Oriented Programming", "description": "Classes, objects, inheritance, and polymorphism", "prerequisites": ["Functions", "Data Structures"] },
+      { "id": "File Handling", "skillId": "skill-python", "name": "File Handling", "description": "Reading and writing files", "prerequisites": ["Python Basics"] },
+      { "id": "Error Handling", "skillId": "skill-python", "name": "Error Handling", "description": "Exception handling and debugging", "prerequisites": ["Control Flow"] },
+      { "id": "Popular Libraries", "skillId": "skill-python", "name": "Popular Libraries", "description": "NumPy, Pandas, and other essential libraries", "prerequisites": ["Data Structures"] }
+    ],
+    "java": [
+      { "id": "Java Basics", "skillId": "skill-java", "name": "Java Basics", "description": "Java fundamentals and setup", "prerequisites": [] },
+      { "id": "Variables and Primitives", "skillId": "skill-java", "name": "Variables and Primitives", "description": "Data types and primitive variables", "prerequisites": ["Java Basics"] },
+      { "id": "Control Structures", "skillId": "skill-java", "name": "Control Structures", "description": "Loops and conditional statements", "prerequisites": ["Java Basics"] },
+      { "id": "Object-Oriented Programming", "skillId": "skill-java", "name": "Object-Oriented Programming", "description": "Classes, objects, and OOP concepts", "prerequisites": ["Control Structures", "Variables and Primitives"] },
+      { "id": "Collections Framework", "skillId": "skill-java", "name": "Collections Framework", "description": "ArrayList, HashMap, and other collections", "prerequisites": ["Object-Oriented Programming"] },
+      { "id": "Exception Handling", "skillId": "skill-java", "name": "Exception Handling", "description": "Try-catch blocks and error handling", "prerequisites": ["Control Structures"] },
+      { "id": "Streams and File I/O", "skillId": "skill-java", "name": "Streams and File I/O", "description": "Working with streams and file operations", "prerequisites": ["Object-Oriented Programming"] }
+    ],
+    "sql": [
+      { "id": "SQL Fundamentals", "skillId": "skill-sql", "name": "SQL Fundamentals", "description": "SELECT, INSERT, UPDATE, DELETE basics", "prerequisites": [] },
+      { "id": "WHERE and Filtering", "skillId": "skill-sql", "name": "WHERE and Filtering", "description": "WHERE clause and filtering data", "prerequisites": ["SQL Fundamentals"] },
+      { "id": "Joins", "skillId": "skill-sql", "name": "Joins", "description": "INNER, LEFT, RIGHT, FULL joins", "prerequisites": ["WHERE and Filtering"] },
+      { "id": "Aggregation and Grouping", "skillId": "skill-sql", "name": "Aggregation and Grouping", "description": "GROUP BY, HAVING, and aggregate functions", "prerequisites": ["WHERE and Filtering"] },
+      { "id": "Subqueries", "skillId": "skill-sql", "name": "Subqueries", "description": "Nested queries and correlated subqueries", "prerequisites": ["Joins"] },
+      { "id": "Indexing and Performance", "skillId": "skill-sql", "name": "Indexing and Performance", "description": "Database indexes and query optimization", "prerequisites": ["Aggregation and Grouping"] },
+      { "id": "Transactions and ACID", "skillId": "skill-sql", "name": "Transactions and ACID", "description": "Transaction management and ACID properties", "prerequisites": ["Aggregation and Grouping"] }
+    ],
+    "ml": [
+      { "id": "Machine Learning Fundamentals", "skillId": "skill-ml", "name": "Machine Learning Fundamentals", "description": "Supervised, unsupervised, and reinforcement learning", "prerequisites": [] },
+      { "id": "Statistics for Machine Learning", "skillId": "skill-ml", "name": "Statistics for Machine Learning", "description": "Probability, distributions, and hypothesis testing", "prerequisites": ["Machine Learning Fundamentals"] },
+      { "id": "Data Preprocessing", "skillId": "skill-ml", "name": "Data Preprocessing", "description": "Cleaning, normalization, and feature engineering", "prerequisites": ["Machine Learning Fundamentals"] },
+      { "id": "Regression Models", "skillId": "skill-ml", "name": "Regression Models", "description": "Linear, polynomial, and logistic regression", "prerequisites": ["Statistics for Machine Learning", "Data Preprocessing"] },
+      { "id": "Classification", "skillId": "skill-ml", "name": "Classification", "description": "Decision trees, random forests, and SVMs", "prerequisites": ["Regression Models"] },
+      { "id": "Clustering", "skillId": "skill-ml", "name": "Clustering", "description": "K-means, hierarchical, and DBSCAN clustering", "prerequisites": ["Data Preprocessing"] },
+      { "id": "Model Evaluation", "skillId": "skill-ml", "name": "Model Evaluation", "description": "Cross-validation, metrics, and hyperparameter tuning", "prerequisites": ["Classification", "Regression Models"] }
+    ],
+    "dl": [
+      { "id": "Deep Learning Fundamentals", "skillId": "skill-dl", "name": "Deep Learning Fundamentals", "description": "Neural networks and backpropagation", "prerequisites": [] },
+      { "id": "Neural Networks", "skillId": "skill-dl", "name": "Neural Networks", "description": "Activation functions, layers, and architectures", "prerequisites": ["Deep Learning Fundamentals"] },
+      { "id": "Convolutional Neural Networks", "skillId": "skill-dl", "name": "Convolutional Neural Networks", "description": "CNNs for image recognition and computer vision", "prerequisites": ["Neural Networks"] },
+      { "id": "Recurrent Neural Networks", "skillId": "skill-dl", "name": "Recurrent Neural Networks", "description": "LSTMs, GRUs, and sequence modeling", "prerequisites": ["Neural Networks"] },
+      { "id": "Transformers and Attention", "skillId": "skill-dl", "name": "Transformers and Attention", "description": "Attention mechanisms and transformer architectures", "prerequisites": ["Recurrent Neural Networks"] }
+    ]
+  },
+  "resources": [
+    { "topicId": "Python Basics", "title": "Python Official Tutorial", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/", "description": "Official Python tutorial" },
+    { "topicId": "Python Basics", "title": "Python Programming Course", "type": "COURSE", "url": "https://www.python.org/courses/basics", "description": "Comprehensive Python basics course" },
+    { "topicId": "Variables and Data Types", "title": "Python Data Types Guide", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/datastructures.html", "description": "Guide to Python data types" },
+    { "topicId": "Variables and Data Types", "title": "Variables and Types Video", "type": "VIDEO", "url": "https://youtube.com/watch?v=python-variables-1", "description": "Video on Python variables and types" },
+    { "topicId": "Control Flow", "title": "Python Control Flow", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/controlflow.html", "description": "Control flow statements in Python" },
+    { "topicId": "Control Flow", "title": "If-Else and Loops Tutorial", "type": "COURSE", "url": "https://www.python.org/courses/control-flow", "description": "Interactive control flow tutorial" },
+    { "topicId": "Functions", "title": "Python Functions Guide", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "description": "Comprehensive guide to functions" },
+    { "topicId": "Functions", "title": "Functions Practice Project", "type": "PROJECT", "url": "https://github.com/python-learning/function-projects-v1", "description": "Hands-on function practice projects" },
+    { "topicId": "Data Structures", "title": "Python Data Structures", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists", "description": "Lists, tuples, sets, and dictionaries" },
+    { "topicId": "Data Structures", "title": "Data Structures Visualizer", "type": "COURSE", "url": "https://www.python.org/courses/data-structures", "description": "Interactive data structure visualizations" },
+    { "topicId": "Object-Oriented Programming", "title": "Python OOP Guide", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/classes.html", "description": "Object-oriented programming in Python" },
+    { "topicId": "Object-Oriented Programming", "title": "Design Patterns Book", "type": "BOOK", "url": "https://www.oreilly.com/library/view/design-patterns/", "description": "Design patterns in Python" },
+    { "topicId": "File Handling", "title": "File I/O in Python", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/inputoutput.html", "description": "File operations and I/O" },
+    { "topicId": "Error Handling", "title": "Exception Handling", "type": "ARTICLE", "url": "https://docs.python.org/3/tutorial/errors.html", "description": "Error handling and exceptions" },
+    { "topicId": "Popular Libraries", "title": "NumPy Tutorial", "type": "COURSE", "url": "https://numpy.org/learn/", "description": "NumPy fundamentals" },
+    { "topicId": "Java Basics", "title": "Java Getting Started", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/", "description": "Java language basics" },
+    { "topicId": "Java Basics", "title": "Java Programming Basics", "type": "COURSE", "url": "https://www.java.com/courses/basics-v1", "description": "Java programming fundamentals" },
+    { "topicId": "Variables and Primitives", "title": "Java Primitives and Variables", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html", "description": "Primitive data types" },
+    { "topicId": "Control Structures", "title": "Control Flow Statements", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/flow.html", "description": "If, switch, loops" },
+    { "topicId": "Object-Oriented Programming", "title": "Java OOP Tutorial", "type": "COURSE", "url": "https://docs.oracle.com/javase/tutorial/java/concepts/", "description": "OOP concepts in Java" },
+    { "topicId": "Collections Framework", "title": "Java Collections", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/collections/", "description": "Collections framework guide" },
+    { "topicId": "Exception Handling", "title": "Exceptions in Java", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/", "description": "Exception handling patterns" },
+    { "topicId": "Streams and File I/O", "title": "I/O and Streams", "type": "ARTICLE", "url": "https://docs.oracle.com/javase/tutorial/essential/io/", "description": "File operations in Java" },
+    { "topicId": "SQL Fundamentals", "title": "SQL Tutorial", "type": "ARTICLE", "url": "https://www.w3schools.com/sql/", "description": "SQL basics and syntax" },
+    { "topicId": "SQL Fundamentals", "title": "Introduction to SQL", "type": "COURSE", "url": "https://www.coursera.org/learn/intro-sql", "description": "Comprehensive SQL course" },
+    { "topicId": "WHERE and Filtering", "title": "WHERE Clause Guide", "type": "ARTICLE", "url": "https://www.w3schools.com/sql/sql_where.asp", "description": "WHERE and filtering queries" },
+    { "topicId": "Joins", "title": "SQL Joins Tutorial", "type": "ARTICLE", "url": "https://www.w3schools.com/sql/sql_join.asp", "description": "Different types of joins" },
+    { "topicId": "Joins", "title": "Visual SQL Joins", "type": "COURSE", "url": "https://www.sqlintro.com/joins", "description": "Visual guide to SQL joins" },
+    { "topicId": "Aggregation and Grouping", "title": "GROUP BY and Aggregates", "type": "ARTICLE", "url": "https://www.w3schools.com/sql/sql_groupby.asp", "description": "Aggregation functions" },
+    { "topicId": "Subqueries", "title": "Subqueries in SQL", "type": "ARTICLE", "url": "https://www.w3schools.com/sql/sql_sub_select.asp", "description": "Nested query patterns" },
+    { "topicId": "Indexing and Performance", "title": "Database Indexing", "type": "COURSE", "url": "https://www.pluralsight.com/courses/indexing", "description": "Index design and optimization" },
+    { "topicId": "Transactions and ACID", "title": "ACID Properties", "type": "ARTICLE", "url": "https://www.postgresql.org/docs/current/tutorial-transactions.html", "description": "Transaction management" },
+    { "topicId": "Machine Learning Fundamentals", "title": "ML Fundamentals", "type": "COURSE", "url": "https://www.coursera.org/learn/machine-learning", "description": "Andrew Ng's ML course" },
+    { "topicId": "Machine Learning Fundamentals", "title": "ML Guide", "type": "BOOK", "url": "https://www.oreilly.com/library/view/machine-learning/", "description": "Comprehensive ML book" },
+    { "topicId": "Statistics for Machine Learning", "title": "Statistics and Probability", "type": "ARTICLE", "url": "https://www.khanacademy.org/math/statistics-probability", "description": "Statistics fundamentals" },
+    { "topicId": "Data Preprocessing", "title": "Data Cleaning Guide", "type": "ARTICLE", "url": "https://www.kaggle.com/learn/data-cleaning", "description": "Data preprocessing techniques" },
+    { "topicId": "Regression Models", "title": "Regression Analysis", "type": "COURSE", "url": "https://www.coursera.org/learn/regression-models", "description": "Linear and polynomial regression" },
+    { "topicId": "Classification", "title": "Classification Algorithms", "type": "ARTICLE", "url": "https://scikit-learn.org/stable/supervised_learning.html", "description": "Decision trees and more" },
+    { "topicId": "Clustering", "title": "Clustering Techniques", "type": "COURSE", "url": "https://www.coursera.org/learn/clustering", "description": "K-means and DBSCAN" },
+    { "topicId": "Model Evaluation", "title": "Model Evaluation Metrics", "type": "ARTICLE", "url": "https://scikit-learn.org/stable/modules/model_evaluation.html", "description": "Evaluation metrics and validation" },
+    { "topicId": "Deep Learning Fundamentals", "title": "Deep Learning Course", "type": "COURSE", "url": "https://www.deeplearning.ai/", "description": "DL basics with Andrew Ng" },
+    { "topicId": "Neural Networks", "title": "Neural Network Tutorial", "type": "ARTICLE", "url": "https://playground.tensorflow.org/", "description": "Interactive NN playground" },
+    { "topicId": "Convolutional Neural Networks", "title": "CNN for Image Recognition", "type": "COURSE", "url": "https://www.coursera.org/learn/convolutional-neural-networks", "description": "CNNs and computer vision" },
+    { "topicId": "Recurrent Neural Networks", "title": "Sequence Models", "type": "COURSE", "url": "https://www.coursera.org/learn/sequence-models", "description": "RNNs and LSTMs" },
+    { "topicId": "Transformers and Attention", "title": "Attention is All You Need", "type": "ARTICLE", "url": "https://arxiv.org/abs/1706.03762", "description": "Original transformer paper" }
+  ]
+}

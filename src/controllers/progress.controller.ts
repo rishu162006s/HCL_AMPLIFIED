@@ -1,4 +1,6 @@
-import { Request, Response } from "express";
+import {
+  Response,
+} from "express";
 
 import {
   createNewProgress,
@@ -14,7 +16,13 @@ import {
   updateProgressSchema,
 } from "../validators/progress.validator";
 
-import { AuthenticatedRequest } from "../middleware/auth.middleware";
+import {
+  AuthenticatedRequest,
+} from "../middleware/auth.middleware";
+
+// --------------------------------------------------
+// CREATE PROGRESS
+// --------------------------------------------------
 
 export const createProgressController =
   async (
@@ -27,11 +35,9 @@ export const createProgressController =
           req.body
         );
 
-      const userId = req.user!.userId;
-
       const progress =
         await createNewProgress(
-          userId,
+          req.user!.userId,
           data
         );
 
@@ -44,11 +50,13 @@ export const createProgressController =
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "RESOURCE_NOT_FOUND"
+        error.message ===
+          "RESOURCE_NOT_FOUND"
       ) {
         res.status(404).json({
           success: false,
-          message: "Resource not found",
+          message:
+            "Resource not found",
         });
         return;
       }
@@ -66,20 +74,39 @@ export const createProgressController =
         return;
       }
 
+      if (
+        error instanceof Error &&
+        error.message ===
+          "INVALID_PROGRESS_VALUE"
+      ) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Progress must be between 0 and 100",
+        });
+        return;
+      }
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
-          message: error.message,
+          message:
+            error.message,
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };
+
+// --------------------------------------------------
+// GET ALL MY PROGRESS
+// --------------------------------------------------
 
 export const getMyProgressController =
   async (
@@ -87,22 +114,27 @@ export const getMyProgressController =
     res: Response
   ) => {
     try {
-      const userId = req.user!.userId;
-
       const progress =
-        await getMyProgress(userId);
+        await getMyProgress(
+          req.user!.userId
+        );
 
       res.status(200).json({
         success: true,
         data: progress,
       });
-    } catch (error) {
+    } catch {
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };
+
+// --------------------------------------------------
+// GET ONE PROGRESS
+// --------------------------------------------------
 
 export const getProgressController =
   async (
@@ -110,14 +142,10 @@ export const getProgressController =
     res: Response
   ) => {
     try {
-      const userId = req.user!.userId;
-      const progressId =
-        req.params.progressId;
-
       const progress =
         await getProgress(
-          userId,
-          progressId as string
+          req.user!.userId,
+          req.params.progressId as string
         );
 
       res.status(200).json({
@@ -132,7 +160,8 @@ export const getProgressController =
       ) {
         res.status(404).json({
           success: false,
-          message: "Progress not found",
+          message:
+            "Progress not found",
         });
         return;
       }
@@ -152,10 +181,15 @@ export const getProgressController =
 
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };
+
+// --------------------------------------------------
+// GET PROGRESS BY STATUS
+// --------------------------------------------------
 
 export const getProgressByStatusController =
   async (
@@ -163,30 +197,35 @@ export const getProgressByStatusController =
     res: Response
   ) => {
     try {
-      const status = req.query.status;
+      const status =
+        req.query.status;
 
       const validStatuses = [
         "NOT_STARTED",
         "IN_PROGRESS",
         "COMPLETED",
-      ];
+      ] as const;
 
       if (
         typeof status !== "string" ||
-        !validStatuses.includes(status)
+        !validStatuses.includes(
+          status as
+            | "NOT_STARTED"
+            | "IN_PROGRESS"
+            | "COMPLETED"
+        )
       ) {
         res.status(400).json({
           success: false,
-          message: "Invalid progress status",
+          message:
+            "Invalid progress status",
         });
         return;
       }
 
-      const userId = req.user!.userId;
-
       const progress =
         await getProgressByStatus(
-          userId,
+          req.user!.userId,
           status as
             | "NOT_STARTED"
             | "IN_PROGRESS"
@@ -197,13 +236,18 @@ export const getProgressByStatusController =
         success: true,
         data: progress,
       });
-    } catch (error) {
+    } catch {
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };
+
+// --------------------------------------------------
+// UPDATE PROGRESS
+// --------------------------------------------------
 
 export const updateProgressController =
   async (
@@ -216,14 +260,10 @@ export const updateProgressController =
           req.body
         );
 
-      const userId = req.user!.userId;
-      const progressId =
-        req.params.progressId;
-
       const progress =
         await updateMyProgress(
-          userId,
-          progressId as string,
+          req.user!.userId,
+          req.params.progressId as string,
           data
         );
 
@@ -241,7 +281,8 @@ export const updateProgressController =
       ) {
         res.status(404).json({
           success: false,
-          message: "Progress not found",
+          message:
+            "Progress not found",
         });
         return;
       }
@@ -259,20 +300,52 @@ export const updateProgressController =
         return;
       }
 
+      if (
+        error instanceof Error &&
+        error.message ===
+          "INVALID_PROGRESS_VALUE"
+      ) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Progress must be between 0 and 100",
+        });
+        return;
+      }
+
+      if (
+        error instanceof Error &&
+        error.message ===
+          "NO_PROGRESS_UPDATE"
+      ) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Provide status or progress to update",
+        });
+        return;
+      }
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
-          message: error.message,
+          message:
+            error.message,
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };
+
+// --------------------------------------------------
+// DELETE PROGRESS
+// --------------------------------------------------
 
 export const deleteProgressController =
   async (
@@ -280,13 +353,9 @@ export const deleteProgressController =
     res: Response
   ) => {
     try {
-      const userId = req.user!.userId;
-      const progressId =
-        req.params.progressId;
-
       await removeProgress(
-        userId,
-        progressId as string
+        req.user!.userId,
+        req.params.progressId as string
       );
 
       res.status(200).json({
@@ -302,7 +371,8 @@ export const deleteProgressController =
       ) {
         res.status(404).json({
           success: false,
-          message: "Progress not found",
+          message:
+            "Progress not found",
         });
         return;
       }
@@ -322,7 +392,8 @@ export const deleteProgressController =
 
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message:
+          "Internal server error",
       });
     }
   };

@@ -1,3 +1,4 @@
+
 import prisma from "../config/prisma";
 
 // --------------------------------------------------
@@ -11,6 +12,7 @@ export const findDashboardData = async (
     where: {
       id: userId,
     },
+
     select: {
       name: true,
     },
@@ -23,7 +25,13 @@ export const findDashboardData = async (
 
     include: {
       learningPaths: {
-        include: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+
           steps: {
             include: {
               resource: {
@@ -36,6 +44,7 @@ export const findDashboardData = async (
                 },
               },
             },
+
             orderBy: {
               order: "asc",
             },
@@ -54,6 +63,7 @@ export const findDashboardData = async (
       where: {
         userId,
       },
+
       select: {
         score: true,
       },
@@ -65,3 +75,4 @@ export const findDashboardData = async (
     quizAttempts,
   };
 };
+

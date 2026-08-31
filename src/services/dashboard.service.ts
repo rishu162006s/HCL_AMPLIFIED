@@ -1,3 +1,4 @@
+
 import {
   findDashboardData,
 } from "../repositories/dashboard.repository";
@@ -20,89 +21,155 @@ export const getDashboard = async (
   }
 
   // --------------------------------------------------
+  // REMOVE DUPLICATE GOALS
+  // --------------------------------------------------
+  //
+  // A user may already have duplicate goals in the
+  // database from earlier testing.
+  //
+  // We keep the newest goal and ignore older goals
+  // with the same normalized title.
+  //
+  // This does NOT delete anything from the database.
+  // It only prevents duplicates from appearing
+  // on the dashboard.
+  // --------------------------------------------------
+
+  const uniqueGoals = Array.from(
+    new Map(
+      goals.map((goal) => [
+        goal.title.trim().toLowerCase(),
+        goal,
+      ])
+    ).values()
+  );
+
+  // --------------------------------------------------
   // GOAL STATISTICS
   // --------------------------------------------------
 
-  const totalGoals = goals.length;
+  const totalGoals =
+    uniqueGoals.length;
 
-  const activeGoals = goals.filter(
-    (goal) => goal.status === "ACTIVE"
-  ).length;
+  const activeGoals =
+    uniqueGoals.filter(
+      (goal) =>
+        goal.status === "ACTIVE"
+    ).length;
 
   // --------------------------------------------------
   // GOAL-WISE PROGRESS
   // --------------------------------------------------
 
-  const goalProgress = goals.map((goal) => {
-    /*
-     * A goal can have multiple learning paths.
-     * Each learning path can contain multiple steps.
-     *
-     * We flatten all steps belonging to this goal.
-     */
+  const goalProgress =
+    uniqueGoals.map((goal) => {
 
-    const steps = goal.learningPaths.flatMap(
-      (path) => path.steps
-    );
+      // ------------------------------------------------
+      // USE ONLY THE MOST RECENT LEARNING PATH
+      // ------------------------------------------------
 
-    const totalResources = steps.length;
+      const learningPath =
+        goal.learningPaths?.[0];
 
-    const completedResources =
-      steps.filter((step) => {
-        const progress =
-          step.resource.progress[0];
+      const steps =
+        learningPath?.steps ?? [];
 
-        return (
-          progress &&
-          progress.status === "COMPLETED"
-        );
-      }).length;
+      const totalResources =
+        steps.length;
 
-    const progress =
-      totalResources === 0
-        ? 0
-        : Math.round(
-            (completedResources /
-              totalResources) *
-              100
+      // ------------------------------------------------
+      // COMPLETED RESOURCES
+      // ------------------------------------------------
+
+      const completedResources =
+        steps.filter((step) => {
+
+          const progress =
+            step.resource.progress[0];
+
+          return (
+            progress &&
+            progress.status ===
+              "COMPLETED"
           );
+        }).length;
 
-    // --------------------------------------------------
-    // FIND NEXT RESOURCE TO RESUME
-    // --------------------------------------------------
+      // ------------------------------------------------
+      // CALCULATE PROGRESS
+      // ------------------------------------------------
 
-    const nextStep = steps.find((step) => {
-      const resourceProgress =
-        step.resource.progress[0];
+      const progress =
+        totalResources === 0
+          ? 0
+          : Math.round(
+              (completedResources /
+                totalResources) *
+                100
+            );
 
-      return (
-        !resourceProgress ||
-        resourceProgress.status !==
-          "COMPLETED"
-      );
+      // ------------------------------------------------
+      // FIND NEXT RESOURCE
+      // ------------------------------------------------
+
+      const nextStep =
+        steps.find((step) => {
+
+          const resourceProgress =
+            step.resource.progress[0];
+
+          return (
+            !resourceProgress ||
+            resourceProgress.status !==
+              "COMPLETED"
+          );
+        });
+
+      // ------------------------------------------------
+      // RETURN GOAL DATA
+      // ------------------------------------------------
+
+      return {
+        goalId: goal.id,
+
+        title: goal.title,
+
+        status: goal.status,
+
+        progress,
+
+        completedResources,
+
+        totalResources,
+
+        learningPathId: learningPath?.id ?? null,
+
+        learningPathTitle: learningPath?.title ?? null,
+
+        resume: nextStep
+  ? {
+      learningPathId:
+        goal.learningPaths.find(
+          (path) =>
+            path.steps.some(
+              (step) =>
+                step.id === nextStep.id
+            )
+        )?.id ?? null,
+
+      stepId: nextStep.id,
+
+      resourceId:
+        nextStep.resource.id,
+
+      resourceTitle:
+        nextStep.resource.title,
+
+      resourceUrl:
+        nextStep.resource.url,
+    }
+  : null,
+      };
     });
-
-    return {
-      goalId: goal.id,
-      title: goal.title,
-      status: goal.status,
-      progress,
-      completedResources,
-      totalResources,
-
-      resume: nextStep
-        ? {
-            stepId: nextStep.id,
-            resourceId:
-              nextStep.resource.id,
-            resourceTitle:
-              nextStep.resource.title,
-            resourceUrl:
-              nextStep.resource.url,
-          }
-        : null,
-    };
-  });
 
   // --------------------------------------------------
   // QUIZ PERFORMANCE
@@ -119,7 +186,8 @@ export const getDashboard = async (
             (sum, attempt) =>
               sum + attempt.score,
             0
-          ) / quizAttemptsCount
+          ) /
+            quizAttemptsCount
         );
 
   // --------------------------------------------------
@@ -140,3 +208,4 @@ export const getDashboard = async (
     quizPercentage,
   };
 };
+
