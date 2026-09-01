@@ -26,7 +26,6 @@ import aiRoutes from "./ai/routes/ai.routes";
 const app = express();
 
 app.use(helmet());
-   import cors from "cors";
 
    app.use(cors({
 
